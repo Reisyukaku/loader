@@ -152,7 +152,7 @@ static int patch_memory(start, size, pattern, patsize, offset, replace, repsize,
 int patch_code(u64 progid, u8 *code, u32 size){
     //File vars
     IFile fp;
-    FS_Archive archive;
+    FS_Path apath;
     FS_Path ppath;
     size_t len;
     u64 fileSize;
@@ -169,16 +169,15 @@ int patch_code(u64 progid, u8 *code, u32 size){
     u8 patch[0x100];
     
     len = strnlen(path, PATH_MAX);
-    archive.id = ARCHIVE_SDMC;
-    archive.lowPath.type = PATH_EMPTY;
-    archive.lowPath.size = 1;
-    archive.lowPath.data = (u8 *)"";
+    apath.type = PATH_EMPTY;
+    apath.size = 1;
+    apath.data = (u8 *)"";
     ppath.type = PATH_ASCII;
     ppath.data = path;
     ppath.size = len+1;
     
     //Read patches from SD
-    if(R_FAILED(IFile_Open(&fp, archive, ppath, FS_OPEN_READ))) goto end;
+    if(R_FAILED(IFile_Open(&fp, ARCHIVE_SDMC, apath, ppath, FS_OPEN_READ))) goto end;
     if(R_FAILED(IFile_GetSize(&fp, &fileSize))) goto end;
     while (!feof(&fp)) { //Read all patches concatinated
         if (R_FAILED(IFile_Read(&fp, &br, &read_id, 8))) goto end;
